@@ -2,7 +2,7 @@
 compare performance results from junit-xml-parser output json
 
 ## Grunt Config Options
-```json
+```javascript
 'performance-comparer': {
 	options: {
 		prev: 'tests-reports/prev-',
@@ -19,7 +19,7 @@ compare performance results from junit-xml-parser output json
 
 ## Use with "watch" for development
 Here is an example how to use this task with watch and karma (with junit reporter).
-```json
+```javascript
 concurrent: {
   	options: {
   		logConcurrentOutput: true
