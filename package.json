@@ -1,0 +1,16 @@
+{
+  "name": "performance-comparer",
+  "version": "1.0.0",
+  "description": "compare performance results from junit-xml-parser output json",
+  "files": [
+    "tasks"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+  	"junit-xml-parser": "^1.0.0"
+  },
+  "author": "omri eyal",
+  "license": "ISC"
+}
