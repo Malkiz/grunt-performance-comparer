@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-	var parser = require('../../junit-xml-parser');
+	var parser = require('junit-xml-parser');
 	var comparer = require('../lib/index.js');
 	var fs = require('fs');
 
