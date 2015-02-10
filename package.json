@@ -5,11 +5,12 @@
   "files": [
     "tasks"
   ],
+  "repository": "http://github.com/Malkiz/grunt-performance-comparer",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-  	"junit-xml-parser": "^1.0.0"
+  	"junit-xml-parser": "Malkiz/junit-xml-parser"
   },
   "author": "omri eyal",
   "license": "ISC"
