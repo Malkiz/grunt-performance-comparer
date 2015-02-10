@@ -18,7 +18,8 @@ compare performance results from junit-xml-parser output json
 ```
 
 ## Use with "watch" for development
-Here is an example how to use this task with watch and karma (with junit reporter).
+Here is an example how to use this task with watch and karma (with junit reporter).<br>
+Runt this with "grunt concurrent:unit"
 ```javascript
 concurrent: {
   	options: {
