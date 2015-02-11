@@ -1,6 +1,9 @@
 # grunt-performance-comparer
 compare performance results from junit-xml-parser output json
 
+## Installation
+`npm install git://github.com/Malkiz/grunt-performance-comparer`
+
 ## Grunt Config Options
 ```javascript
 'performance-comparer': {
@@ -17,7 +20,7 @@ compare performance results from junit-xml-parser output json
 }
 ```
 
-## Use with "watch" for development
+## Use with `watch` for development
 Here is an example how to use this task with watch and karma (with junit reporter).<br>
 Run this with `grunt concurrent:unit`
 ```javascript
@@ -43,6 +46,7 @@ watch: {
   	prev: 'tests-reports/prev-',
   	out: 'tests-reports/report-',
   	warnings: false,
+  	verbose: true,
   	threshold: 20,
   	override: true
   },
