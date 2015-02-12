@@ -2,7 +2,9 @@
 compare performance results from junit-xml-parser output json
 
 ## Installation
-`npm install git://github.com/Malkiz/grunt-performance-comparer`
+`npm install git://github.com/Malkiz/grunt-performance-comparer --save-dev`
+
+`grunt.loadNpmTasks('performance-comparer');`
 
 ## Grunt Config Options
 ```javascript
