@@ -21,7 +21,12 @@ module.exports = function(grunt) {
 
 		var xmlPathToFilename = {};
 
-		var prev = xmlFilePaths.reduce(function(map, filepath) {
+		if (options.aggregate) {
+			console.log('Aggregating to ' + options.aggregate);
+			parsedData = comparer.aggregate(parsedData, options.aggregate);
+		}
+		
+		var prev = Object.keys(parsedData).reduce(function(map, filepath) {
 			var filename = filepath.substring(filepath.lastIndexOf('/') + 1, filepath.lastIndexOf('.'));
 			xmlPathToFilename[filepath] = filename;
 			var path = options.prev + filename + '.js';
@@ -33,7 +38,7 @@ module.exports = function(grunt) {
 			return map;
 		}, {});
 
-		console.log('Comparing to files:\n  ' + Object.keys(prev).map(function(filepath){
+		console.log('Comparing to:\n  ' + Object.keys(prev).map(function(filepath){
 			return options.prev + xmlPathToFilename[filepath] + '.js';
 		}).join('\n  '));
 
@@ -66,7 +71,7 @@ module.exports = function(grunt) {
 
 		if (options.override || Object.keys(prev).length == 0) {
 			console.log('Saving prev files:')
-			xmlFilePaths.forEach(function(filepath) {
+			Object.keys(parsedData).forEach(function(filepath) {
 				var path = options.prev + xmlPathToFilename[filepath] + '.js';
 				console.log('  ' + path);
 				fs.writeFileSync(path, JSON.stringify(parsedData[filepath]));
