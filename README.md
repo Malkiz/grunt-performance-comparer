@@ -10,6 +10,7 @@ compare performance results from junit-xml-parser output json
 	options: {
 		prev: 'tests-reports/prev-',
 		out: 'tests-reports/report-',
+		verbose: true,
 		warnings: false,
 		threshold: 20,
 		override: true
