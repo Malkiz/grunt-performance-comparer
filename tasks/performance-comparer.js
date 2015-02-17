@@ -25,18 +25,44 @@ module.exports = function(grunt) {
 			console.log('Aggregating to ' + options.aggregate);
 			parsedData = comparer.aggregate(parsedData, options.aggregate);
 		}
-		
-		var prev = Object.keys(parsedData).reduce(function(map, filepath) {
-			var filename = filepath.substring(filepath.lastIndexOf('/') + 1, filepath.lastIndexOf('.'));
-			xmlPathToFilename[filepath] = filename;
-			var path = options.prev + filename + '.js';
-			try {
-				map[filepath] = JSON.parse(fs.readFileSync(path).toString());
-			} catch(ex) {
-				delete map[filepath];
+
+		var isPrevPrefix = false;
+		var prev = grunt.file.expand(options.prev);
+		if (prev && prev.length) {
+			prev = prev.reduce(function(map, filepath) {
+				try {
+					var matched = filepath.match(/\/([^\/]*)\.([^\.]*)$/);
+					var ext = matched[2];
+					if (ext && ext.toLowerCase() == 'xml') {
+						map[filepath] = parser.parse(filepath, options.warnings ? console : {log:function(){}});
+					} else {
+						map[filepath] = JSON.parse(fs.readFileSync(filepath).toString());
+					}
+					xmlPathToFilename[filepath] = filepath;
+				} catch(ex) {
+					delete map[filepath];
+				}
+				return map;
+			}, {});
+
+			if (options.aggregate) {
+				prev = comparer.aggregate(prev, options.aggregate);
+				xmlPathToFilename[options.aggregate] = options.aggregate;
 			}
-			return map;
-		}, {});
+		} else {
+			isPrevPrefix = true;
+			prev = Object.keys(parsedData).reduce(function(map, filepath) {
+				var filename = filepath.substring(filepath.lastIndexOf('/') + 1, filepath.lastIndexOf('.'));
+				xmlPathToFilename[filepath] = filename;
+				var path = options.prev + filename + '.js';
+				try {
+					map[filepath] = JSON.parse(fs.readFileSync(path).toString());
+				} catch(ex) {
+					delete map[filepath];
+				}
+				return map;
+			}, {});
+		}
 
 		console.log('Comparing to:\n  ' + Object.keys(prev).map(function(filepath){
 			return options.prev + xmlPathToFilename[filepath] + '.js';
@@ -69,7 +95,7 @@ module.exports = function(grunt) {
 			console.log('For details see: \n  ' + pathsArr.join('\n  '));
 		}
 
-		if (options.override || Object.keys(prev).length == 0) {
+		if (isPrevPrefix && (options.override || Object.keys(prev).length == 0)) {
 			console.log('Saving prev files:')
 			Object.keys(parsedData).forEach(function(filepath) {
 				var path = options.prev + xmlPathToFilename[filepath] + '.js';
