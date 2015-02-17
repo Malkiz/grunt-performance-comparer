@@ -65,7 +65,10 @@ module.exports = function(grunt) {
 		}
 
 		console.log('Comparing to:\n  ' + Object.keys(prev).map(function(filepath){
-			return options.prev + xmlPathToFilename[filepath] + '.js';
+			var filename = (!isPrevPrefix ? 
+				xmlPathToFilename[filepath] : 
+				options.prev + xmlPathToFilename[filepath] + '.js')
+			return filename;
 		}).join('\n  '));
 
 		if (Object.keys(prev).length > 0) {
