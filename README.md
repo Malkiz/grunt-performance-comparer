@@ -19,6 +19,12 @@ compare performance results from junit-xml-parser output json
 	},
 	unit: {
 		src: 'tests-reports/unitests-results.xml',
+	},
+	multi: {
+		src: 'tests-reports/multi/**/*unitests-results.xml',
+		options: {
+			aggregate: 'unitests-results.xml'
+		}
 	}
 }
 ```
