@@ -71,11 +71,12 @@ module.exports = function(grunt) {
 			return filename;
 		}).join('\n  '));
 
+		var numTooSlow = 0;
 		if (Object.keys(prev).length > 0) {
 			var tooSlow = comparer.compare(prev, parsedData, (options.threshold || 0) / 1000);
 			var pathsArr = [];
 
-			var count = Object.keys(tooSlow).reduce(function(c, filepath){
+			numTooSlow = Object.keys(tooSlow).reduce(function(c, filepath){
 				var path = options.out + xmlPathToFilename[filepath] + '.js';
 				pathsArr.push(path);
 				fs.writeFileSync(path, JSON.stringify(tooSlow[filepath]));
@@ -94,7 +95,7 @@ module.exports = function(grunt) {
 					return c + Object.keys(tooSlow[filepath][testsuite]).length;
 				}, c);
 			}, 0);
-			console.log(count + ' tests were slower than expected!');
+			console.log(numTooSlow + ' tests were slower than expected!');
 			console.log('For details see: \n  ' + pathsArr.join('\n  '));
 		}
 
@@ -105,6 +106,10 @@ module.exports = function(grunt) {
 				console.log('  ' + path);
 				fs.writeFileSync(path, JSON.stringify(parsedData[filepath]));
 			});
+		}
+
+		if (numTooSlow > 0 && options.error) {
+			throw new Error(numTooSlow + ' tests were slower than expected!');
 		}
 	});
 };
