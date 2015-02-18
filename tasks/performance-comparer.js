@@ -78,15 +78,13 @@ module.exports = function(grunt) {
 
 		var numTooSlow = 0;
 		if (Object.keys(prev).length > 0) {
-			var tooSlow = comparer.compare(prev, parsedData, (options.threshold || 0) / 1000);
-			var pathsArr = [];
+			var compareResult = comparer.compare(prev, parsedData, (options.threshold || 0) / 1000,
+				function (filepath) {
+					return options.out + xmlPathToFilename[filepath] + '.xml';
+				});
+			var tooSlow = compareResult.tooSlow;
 
 			numTooSlow = Object.keys(tooSlow).reduce(function(c, filepath){
-				var path = options.out + xmlPathToFilename[filepath] + '.js';
-				pathsArr.push(path);
-				fs.writeFileSync(path, JSON.stringify(tooSlow[filepath]));
-				
-				var duplicates = [];
 				return Object.keys(tooSlow[filepath]).reduce(function(c, testsuite){
 					if (options.verbose) {
 						console.log(testsuite);
@@ -101,7 +99,7 @@ module.exports = function(grunt) {
 				}, c);
 			}, 0);
 			console.log(numTooSlow + ' tests were slower than expected!');
-			console.log('For details see: \n  ' + pathsArr.join('\n  '));
+			console.log('For details see: \n  ' + compareResult.pathsArr.join('\n  '));
 		}
 
 		if (isPrevPrefix && (options.override || Object.keys(prev).length == 0)) {
