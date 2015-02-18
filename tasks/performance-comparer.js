@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 	var parser = require('junit-xml-parser');
 	var comparer = require('../lib/index.js');
 	var fs = require('fs');
+	var path = require('path');
 
 	grunt.registerMultiTask('performance-comparer', 'compare performance results', function(){
 		var _this = this;
@@ -80,7 +81,9 @@ module.exports = function(grunt) {
 		if (Object.keys(prev).length > 0) {
 			var compareResult = comparer.compare(prev, parsedData, (options.threshold || 0) / 1000,
 				function (filepath) {
-					return options.out + xmlPathToFilename[filepath] + '.xml';
+					var ext = path.extname(xmlPathToFilename[filepath]);
+					var name = path.basename(xmlPathToFilename[filepath], ext);
+					return options.out + name + '.xml';
 				});
 			var tooSlow = compareResult.tooSlow;
 
