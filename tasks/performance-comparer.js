@@ -28,6 +28,7 @@ module.exports = function(grunt) {
 
 		var isPrevPrefix = false;
 		var prev = grunt.file.expand(options.prev);
+		var prevFileNames;
 		if (prev && prev.length) {
 			prev = prev.reduce(function(map, filepath) {
 				try {
@@ -44,6 +45,8 @@ module.exports = function(grunt) {
 				}
 				return map;
 			}, {});
+
+			prevFileNames = Object.keys(prev);
 
 			if (options.aggregate) {
 				prev = comparer.aggregate(prev, options.aggregate);
@@ -62,9 +65,11 @@ module.exports = function(grunt) {
 				}
 				return map;
 			}, {});
+
+			prevFileNames = Object.keys(prev);
 		}
 
-		console.log('Comparing to:\n  ' + Object.keys(prev).map(function(filepath){
+		console.log('Comparing to:\n  ' + prevFileNames.map(function (filepath){
 			var filename = (!isPrevPrefix ? 
 				xmlPathToFilename[filepath] : 
 				options.prev + xmlPathToFilename[filepath] + '.js')
