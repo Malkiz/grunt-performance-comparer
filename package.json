@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "chalk": "^1.0.0",
     "junit-xml-parser": "Malkiz/junit-xml-parser",
     "xmlbuilder": "^2.5.2"
   },

@@ -3,6 +3,7 @@ module.exports = function(grunt) {
 	var comparer = require('../lib/index.js');
 	var fs = require('fs');
 	var path = require('path');
+	var chalk = require('chalk');
 
 	grunt.registerMultiTask('performance-comparer', 'compare performance results', function(){
 		var _this = this;
@@ -86,22 +87,40 @@ module.exports = function(grunt) {
 					return options.out + name + '.xml';
 				});
 			var tooSlow = compareResult.tooSlow;
+			var faster = compareResult.faster;
 
 			numTooSlow = Object.keys(tooSlow).reduce(function(c, filepath){
 				return Object.keys(tooSlow[filepath]).reduce(function(c, testsuite){
 					if (options.verbose) {
 						console.log(testsuite);
 						Object.keys(tooSlow[filepath][testsuite]).forEach(function(testcase) {
-							console.log('  ' + testcase);
-							console.log('    baseTime: ' + tooSlow[filepath][testsuite][testcase].baseTime);
-							console.log('    currentTime: ' + tooSlow[filepath][testsuite][testcase].currentTime);
+							console.log(chalk.red('  ' + testcase));
+							console.log('    baseTime: ' + chalk.yellow(tooSlow[filepath][testsuite][testcase].baseTime));
+							console.log('    currentTime: ' + chalk.yellow(tooSlow[filepath][testsuite][testcase].currentTime));
 						});
 					}
 
 					return c + Object.keys(tooSlow[filepath][testsuite]).length;
 				}, c);
 			}, 0);
-			console.log(numTooSlow + ' tests were slower than expected!');
+
+			var numFaster = Object.keys(faster).reduce(function(c, filepath){
+				return Object.keys(faster[filepath]).reduce(function(c, testsuite){
+					if (options.verbose) {
+						console.log(testsuite);
+						Object.keys(faster[filepath][testsuite]).forEach(function(testcase) {
+							console.log(chalk.green('  ' + testcase));
+							console.log('    baseTime: ' + chalk.cyan(faster[filepath][testsuite][testcase].baseTime));
+							console.log('    currentTime: ' + chalk.cyan(faster[filepath][testsuite][testcase].currentTime));
+						});
+					}
+
+					return c + Object.keys(faster[filepath][testsuite]).length;
+				}, c);
+			}, 0);
+
+			console.log(zero(numTooSlow) + ' tests were slower than expected!');
+			console.log(gtZero(numFaster) + ' tests were faster than expected!');
 			console.log('For details see: \n  ' + compareResult.pathsArr.join('\n  '));
 		}
 
@@ -118,4 +137,16 @@ module.exports = function(grunt) {
 			throw new Error(numTooSlow + ' tests were slower than expected!');
 		}
 	});
+
+	function conditionColor(str, condition, success, fail) {
+		return (condition) ? success(str) : fail(str);
+	}
+
+	function zero(num) {
+		return conditionColor(num, num == 0, chalk.green, chalk.red);
+	}
+
+	function gtZero(num) {
+		return conditionColor(num, num > 0, chalk.green, chalk.white);
+	}
 };
