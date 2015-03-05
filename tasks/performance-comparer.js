@@ -25,7 +25,7 @@ module.exports = function(grunt) {
 
 		if (options.aggregate) {
 			console.log('Aggregating to ' + options.aggregate);
-			parsedData = comparer.aggregate(parsedData, options.aggregate);
+			parsedData = comparer.aggregate(parsedData, options.aggregate, options.adaptResultFn);
 		}
 
 		var isPrevPrefix = false;
@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 			prevFileNames = Object.keys(prev);
 
 			if (options.aggregate) {
-				prev = comparer.aggregate(prev, options.aggregate);
+				prev = comparer.aggregate(prev, options.aggregate, options.adaptResultFn);
 				xmlPathToFilename[options.aggregate] = options.aggregate;
 			}
 		} else {
