@@ -12,7 +12,11 @@ module.exports = function(grunt) {
 			return arr.concat(file.src);
 		}, []);
 
-		console.log('The threshold is ' + options.threshold + ' ms');
+		var thresholdMatch = ('' + options.threshold).match(/([\d]+)([^\d]*)$/);
+		var threshold = thresholdMatch[1];
+		var thresholdType = thresholdMatch[2] || 'ms';
+
+		console.log('The threshold is ' + threshold + ' ' + thresholdType);
 
 		console.log('Parsing files:\n  ' + xmlFilePaths.join('\n  '));
 
@@ -80,7 +84,7 @@ module.exports = function(grunt) {
 
 		var numTooSlow = 0;
 		if (Object.keys(prev).length > 0) {
-			var compareResult = comparer.compare(prev, parsedData, (options.threshold || 0) / 1000,
+			var compareResult = comparer.compare(prev, parsedData, threshold, thresholdType,
 				function (filepath) {
 					var ext = path.extname(xmlPathToFilename[filepath]);
 					var name = path.basename(xmlPathToFilename[filepath], ext);
