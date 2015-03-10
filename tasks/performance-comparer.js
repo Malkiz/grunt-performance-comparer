@@ -8,15 +8,12 @@ module.exports = function(grunt) {
 	grunt.registerMultiTask('performance-comparer', 'compare performance results', function(){
 		var _this = this;
 		var options = _this.options();
+		var override = grunt.option('override');
 		var xmlFilePaths = _this.files.reduce(function(arr, file) {
 			return arr.concat(file.src);
 		}, []);
 
-		var thresholdMatch = ('' + options.threshold).match(/([\d]+)([^\d]*)$/);
-		var threshold = thresholdMatch[1];
-		var thresholdType = thresholdMatch[2] || 'ms';
-
-		console.log('The threshold is ' + threshold + ' ' + thresholdType);
+		console.log('The threshold is ' + JSON.stringify(options.threshold) + ' (seconds)');
 
 		console.log('Parsing files:\n  ' + xmlFilePaths.join('\n  '));
 
@@ -29,7 +26,20 @@ module.exports = function(grunt) {
 
 		if (options.aggregate) {
 			console.log('Aggregating to ' + options.aggregate);
-			parsedData = comparer.aggregate(parsedData, options.aggregate);
+			parsedData = comparer.aggregate(parsedData, options.aggregate, options.adaptResultFn);
+		}
+
+		var failure = Object.keys(parsedData).reduce(function (b, filepath) {
+			return b || Object.keys(parsedData[filepath]).reduce(function (b, testsuite) {
+				return b || Object.keys(parsedData[filepath][testsuite].testcases).reduce(function (b, fullName) {
+					return b || parsedData[filepath][testsuite].testcases[fullName].failure;
+				}, false);
+			}, false);
+		}, false);
+
+		if (failure) {
+			console.log('There were failed tests - aborting performance test.');
+			return;
 		}
 
 		var isPrevPrefix = false;
@@ -55,12 +65,12 @@ module.exports = function(grunt) {
 			prevFileNames = Object.keys(prev);
 
 			if (options.aggregate) {
-				prev = comparer.aggregate(prev, options.aggregate);
+				prev = comparer.aggregate(prev, options.aggregate, options.adaptResultFn);
 				xmlPathToFilename[options.aggregate] = options.aggregate;
 			}
 		} else {
 			isPrevPrefix = true;
-			prev = Object.keys(parsedData).reduce(function(map, filepath) {
+			prev = Object.keys(parsedData).reduce(function (map, filepath) {
 				var filename = filepath.substring(filepath.lastIndexOf('/') + 1, filepath.lastIndexOf('.'));
 				xmlPathToFilename[filepath] = filename;
 				var path = options.prev + filename + '.js';
@@ -84,7 +94,7 @@ module.exports = function(grunt) {
 
 		var numTooSlow = 0;
 		if (Object.keys(prev).length > 0) {
-			var compareResult = comparer.compare(prev, parsedData, threshold, thresholdType,
+			var compareResult = comparer.compare(prev, parsedData, options.threshold,
 				function (filepath) {
 					var ext = path.extname(xmlPathToFilename[filepath]);
 					var name = path.basename(xmlPathToFilename[filepath], ext);
@@ -128,7 +138,7 @@ module.exports = function(grunt) {
 			console.log('For details see: \n  ' + compareResult.pathsArr.join('\n  '));
 		}
 
-		if (isPrevPrefix && (options.override || Object.keys(prev).length == 0)) {
+		if (isPrevPrefix && (override || options.override || Object.keys(prev).length == 0)) {
 			console.log('Saving prev files:')
 			Object.keys(parsedData).forEach(function(filepath) {
 				var path = options.prev + xmlPathToFilename[filepath] + '.js';
