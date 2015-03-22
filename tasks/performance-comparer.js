@@ -96,6 +96,7 @@ module.exports = function(grunt) {
 		}).join('\n  '));
 
 		var numTooSlow = 0;
+		var failureCount = 0;
 		if (Object.keys(prev).length > 0) {
 			var compareResult = comparer.compare(prev, parsedData, options.threshold,
 				function (filepath) {
@@ -105,6 +106,7 @@ module.exports = function(grunt) {
 				});
 			var tooSlow = compareResult.tooSlow;
 			var faster = compareResult.faster;
+			failureCount = compareResult.failureCount;
 
 			numTooSlow = Object.keys(tooSlow).reduce(function(c, filepath){
 				return Object.keys(tooSlow[filepath]).reduce(function(c, testsuite){
@@ -150,8 +152,8 @@ module.exports = function(grunt) {
 			});
 		}
 
-		if (numTooSlow > 0 && options.error) {
-			throw new Error(numTooSlow + ' tests were slower than expected!');
+		if (failureCount > 0 && options.error) {
+			throw new Error(failureCount + ' tests failed in performance!');
 		}
 	});
 
