@@ -1,6 +1,8 @@
 module.exports = function(grunt) {
 	var parser = require('junit-xml-parser');
 	var comparer = require('../lib/index.js');
+	var reporter = new require('../lib/reporters/multi.js').Reporter;
+	var emitter = require('../lib/eventbus.js').emitter;
 	var fs = require('fs');
 	var path = require('path');
 	var chalk = require('chalk');
@@ -8,6 +10,10 @@ module.exports = function(grunt) {
 	grunt.registerMultiTask('performance-comparer', 'compare performance results', function(){
 		var _this = this;
 		var options = _this.options();
+		
+		reporter.init(options.reporters);
+		emitter.emit('init', options);
+
 		var override = grunt.option('override');
 		var xmlFilePaths = _this.files.reduce(function(arr, file) {
 			return arr.concat(file.src);
