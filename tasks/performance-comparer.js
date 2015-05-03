@@ -158,8 +158,13 @@ module.exports = function(grunt) {
 			});
 		}
 
-		if (failureCount > 0 && options.error) {
-			throw new Error(failureCount + ' tests failed in performance!');
+		if (failureCount > 0) {
+			if (options.failedCallback) {
+				options.failedCallback();
+			}
+			if (options.error) {
+				throw new Error(failureCount + ' tests failed in performance!');
+			}
 		}
 	});
 
