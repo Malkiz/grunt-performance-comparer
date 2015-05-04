@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 			}, false);
 		}, false);
 
-		if (failure) {
+		if (failure && !options.ignoreFailures) {
 			console.log('There were failed tests - aborting performance test.');
 			if (options.error) {
 				throw new Error('There were failed tests - aborting performance test.');
